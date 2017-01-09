@@ -17,12 +17,15 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                @Html.ActionLink("Application name", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+                <a class="navbar-brand"  title="Dinner Club">
+                    <img style="max-width:140px; margin-top: -2px;" src="~/Content/Images/icon3.png" alt="logo">
+                </a>
+                @*@Html.ActionLink("Application name", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })*@
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
                     <li>@Html.ActionLink("Home", "Index", "Home")</li>
-                    <li>@Html.ActionLink("Dinner List", "List", "DinnerList")</li>
+                    <li>@Html.ActionLink("Dinners", "List", "DinnerList")</li>
                 </ul>
                 @Html.Partial("_LoginPartial")
             </div>
@@ -32,7 +35,7 @@
         @RenderBody()
         <hr />
         <footer>
-            <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
+            <p>&copy; @DateTime.Now.Year - This ASP.NET application is made by Jonas Larsen.</p>
         </footer>
     </div>
 

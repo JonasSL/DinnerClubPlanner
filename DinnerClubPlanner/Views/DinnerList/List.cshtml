@@ -1,9 +1,22 @@
 ﻿@using DinnerClubPlanner.Models
 @using Microsoft.AspNet.Identity
 @{
-    ViewBag.Title = "Dinner List";
+    ViewBag.Title = "Dinners";
 }
-<h2>@ViewBag.Title.</h2>
+<h2>@ViewBag.Title</h2>
+
+@{
+    // If the user id is null, disable all buttons.
+    var currentUserId = User.Identity.GetUserId();
+    var disabled = currentUserId == null ? "disabled" : "";
+
+    if (currentUserId == null)
+    {
+        <p>Please log in to cancel or attend dinners.</p>
+    }
+}
+
+
 
 <div class="table-responsive">
     <table class="table">
@@ -27,12 +40,9 @@
             var totalAttending = totalUsers - notAttending.Count();
 
             // Figure out if the current user is attending the event
-            var currentUserId = User.Identity.GetUserId();
             var hasCancelled = item.NotAttending.Any(x => x.Id == currentUserId);
 
-            // If the user has cancelled, we should disable the cancel button
-            var btnClasses = hasCancelled ? "disabled" : "";
-
+            
             <tr>
                 <td>@Html.DisplayFor(modelItem => date)</td>
                 <td>@Html.DisplayFor(modelItem => notAttStr)</td>
@@ -42,14 +52,14 @@
                     @{
                         if (hasCancelled)
                         {
-                            <button class="btn btn-danger" type="button"
+                            <button class="btn btn-danger @Html.Encode(disabled)" type="button"
                                     onclick="location.href = '@Url.Action("AttendEvent", new {dinnerEventId = item.Id})'">
                                 Attend
                             </button>
                         }
                         else
                         {
-                            <button class="btn btn-info" type="button"
+                            <button class="btn btn-info @Html.Encode(disabled)" type="button"
                                     onclick="location.href = '@Url.Action("CancelEvent", new {dinnerEventId = item.Id})'">
                                 Cancel
                             </button>

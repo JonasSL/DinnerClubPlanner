@@ -1,8 +1,7 @@
-﻿
-@{
-    ViewBag.Title = "Confirmation";
-}
+﻿<h2>Cancel Dinner</h2>
+<p>@ViewBag.Message</p>
 
-<h2>Confirmation</h2>
-<h3>@ViewBag.Message</h3>
-
+<button class="btn" type="button"
+        onclick="location.href = '@Url.Action("List")'">
+    &laquo; Back
+</button>
