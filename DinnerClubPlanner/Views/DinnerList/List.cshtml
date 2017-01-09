@@ -1,0 +1,40 @@
+﻿@using DinnerClubPlanner.Models
+@{
+    ViewBag.Title = "Dinner List";
+}
+<h2>@ViewBag.Title.</h2>
+<h3>@ViewBag.Message</h3>
+
+<div class="table-responsive">
+    <table class="table">
+        <tr>
+            <th>Date</th>
+            <th>Not Attending</th>
+            <th>Total Attending</th>
+            <th></th>
+        </tr>
+        
+        @{
+            var totalUsers = ((Tuple<List<DinnerClubEvent>, int>)Model).Item2;
+
+        }
+
+        @foreach (DinnerClubEvent item in ((Tuple<List<DinnerClubEvent>, int>) Model).Item1)
+        {
+            var date = item.Date.ToShortDateString();
+            var notAttending = item.NotAttending.Select(x => x.UserName).ToList();
+            var notAttStr = notAttending.Any() ? string.Join(", ", notAttending) : "None";
+            var totalAttending = totalUsers - notAttending.Count();
+
+            <tr>
+                <td>@Html.DisplayFor(modelItem => date)</td>
+                <td>@Html.DisplayFor(modelItem => notAttStr)</td>
+                <td>@Html.DisplayFor(modelItem => totalAttending)</td>
+                <td>
+                    <button class="btn btn-info" type="button" id="addressSearch"
+                            onclick="location.href='@Url.Action("Confirmation", new { dinnerEvent = item})'">Afmeld</button>
+                </td>
+            </tr>
+        }
+    </table>
+</div>
