@@ -1,9 +1,9 @@
 ﻿@using DinnerClubPlanner.Models
+@using Microsoft.AspNet.Identity
 @{
     ViewBag.Title = "Dinner List";
 }
 <h2>@ViewBag.Title.</h2>
-<h3>@ViewBag.Message</h3>
 
 <div class="table-responsive">
     <table class="table">
@@ -12,11 +12,11 @@
             <th>Not Attending</th>
             <th>Total Attending</th>
             <th></th>
+
         </tr>
         
         @{
             var totalUsers = ((Tuple<List<DinnerClubEvent>, int>)Model).Item2;
-
         }
 
         @foreach (DinnerClubEvent item in ((Tuple<List<DinnerClubEvent>, int>) Model).Item1)
@@ -26,14 +26,42 @@
             var notAttStr = notAttending.Any() ? string.Join(", ", notAttending) : "None";
             var totalAttending = totalUsers - notAttending.Count();
 
+            // Figure out if the current user is attending the event
+            var currentUserId = User.Identity.GetUserId();
+            var hasCancelled = item.NotAttending.Any(x => x.Id == currentUserId);
+
+            // If the user has cancelled, we should disable the cancel button
+            var btnClasses = hasCancelled ? "disabled" : "";
+
             <tr>
                 <td>@Html.DisplayFor(modelItem => date)</td>
                 <td>@Html.DisplayFor(modelItem => notAttStr)</td>
                 <td>@Html.DisplayFor(modelItem => totalAttending)</td>
                 <td>
-                    <button class="btn btn-info" type="button" id="addressSearch"
-                            onclick="location.href='@Url.Action("Confirmation", new { dinnerEvent = item})'">Afmeld</button>
+                    
+                    @{
+                        if (hasCancelled)
+                        {
+                            <button class="btn btn-danger" type="button"
+                                    onclick="location.href = '@Url.Action("AttendEvent", new {dinnerEventId = item.Id})'">
+                                Attend
+                            </button>
+                        }
+                        else
+                        {
+                            <button class="btn btn-info" type="button"
+                                    onclick="location.href = '@Url.Action("CancelEvent", new {dinnerEventId = item.Id})'">
+                                Cancel
+                            </button>
+                        }
+                    }
+                    
+                    
+
+                    
+
                 </td>
+                
             </tr>
         }
     </table>

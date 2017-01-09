@@ -241,7 +241,8 @@
     <Content Include="Views\Shared\Lockout.cshtml" />
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
     <Content Include="Views\DinnerList\List.cshtml" />
-    <Content Include="Views\DinnerList\Confirmation.cshtml" />
+    <Content Include="Views\DinnerList\CancelEvent.cshtml" />
+    <Content Include="Views\DinnerList\AttendEvent.cshtml" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

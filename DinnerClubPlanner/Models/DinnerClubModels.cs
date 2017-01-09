@@ -5,6 +5,7 @@ using System.Web;
 
 namespace DinnerClubPlanner.Models
 {
+    [Serializable]
     public class DinnerClubEvent
     {
         public DateTime Date { get; set; }

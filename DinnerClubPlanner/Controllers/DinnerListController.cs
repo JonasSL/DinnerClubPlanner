@@ -103,19 +103,69 @@ namespace DinnerClubPlanner.Controllers
         }
 
         [Authorize]
-        public ActionResult Confirmation(DinnerClubEvent dinnerEvent)
+        public ActionResult CancelEvent(string dinnerEventId)
         {
-            ViewBag.Message = "Your cancellation was successful";
+
             var conn = new SqlConnection();
+            var currentUserId = User.Identity.GetUserId();
 
             conn.ConnectionString = System.Configuration.ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
             conn.Open();
+            try
+            {
+                var sqlCommand =
+                    new SqlCommand(
+                        $"INSERT INTO Cancellations (UserId,EventId) VALUES ('{currentUserId}', '{dinnerEventId}')",
+                        conn);
+                sqlCommand.ExecuteNonQuery();
+            }
+            catch (Exception e)
+            {
+                ViewBag.Message = "Your cancellation was NOT registered. Please try again later.";
+                return View();
+            }
+            finally
+            {
+                conn.Close();
+            }
 
+            ViewBag.Message = $"Your cancellation for the dinner event on was successful.";
+            return View();
+        }
+
+        /// <summary>
+        /// "Cancels" the cancellation of the attendance. You now attend the event.
+        /// </summary>
+        /// <param name="dinnerEventId"></param>
+        /// <returns></returns>
+        [Authorize]
+        public ActionResult AttendEvent(string dinnerEventId)
+        {
+            var conn = new SqlConnection();
             var currentUserId = User.Identity.GetUserId();
-            var sqlCommand = new SqlCommand($"INSERT INTO Cancellations (UserId,EventId) VALUES ('{currentUserId}', '{dinnerEvent.Id}')", conn);
-            sqlCommand.ExecuteNonQuery();
-            conn.Close();
-            return View(true);
-        }   
+
+            conn.ConnectionString = System.Configuration.ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
+            conn.Open();
+            try
+            {
+                var sqlCommand =
+                    new SqlCommand(
+                        $"DELETE FROM Cancellations WHERE EventId='{dinnerEventId}' AND UserId='{currentUserId}'",
+                        conn);
+                sqlCommand.ExecuteNonQuery();
+            }
+            catch
+            {
+                ViewBag.Message = "Something went wrong. Please try again later.";
+                return View();
+            }
+            finally
+            {
+                conn.Close();
+            }
+
+            ViewBag.Message = $"Success! You now attend the dinner again.";
+            return View();
+        }
     }
 }
