@@ -95,8 +95,10 @@ namespace DinnerClubPlanner.Controllers
                 users = !countReader.IsDBNull(0) ? countReader.GetInt32(0) : 0;
             }
             countReader.Close();
-
             conn.Close();
+
+            // Order eventList by date
+            eventList = eventList.OrderBy(x => x.Date).ToList();
 
             var modelObj = new Tuple<List<DinnerClubEvent>, int>(eventList, users);
             return View(modelObj);
@@ -166,6 +168,75 @@ namespace DinnerClubPlanner.Controllers
 
             ViewBag.Message = $"Success! You now attend the dinner again.";
             return View();
+        }
+
+        public ActionResult DinnerDetails(string dinnerEventId)
+        {
+            var conn = new SqlConnection();
+
+            conn.ConnectionString = System.Configuration.ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
+            conn.Open();
+
+
+
+            #region Get cancelled users
+            // Join on AspNetUsers to get user information
+            var query = new SqlCommand("SELECT  AspNetUsers.Username, Cancellations.TimeStamp " +
+                                       "FROM Cancellations " +
+                                       "INNER JOIN AspNetUsers " +
+                                       "ON Cancellations.UserId=AspNetUsers.Id " +
+                                       $"AND Cancellations.EventId='{dinnerEventId}'", conn);
+            // Read form SQL server
+            var reader = query.ExecuteReader();
+
+            // Read the query result
+            var notAttending = new List<UserEvent>();
+            while (reader.Read())
+            {
+                notAttending.Add(new UserEvent
+                {
+                    EventId = dinnerEventId,
+                    TimeStamp = reader.GetDateTime(1),
+                    UserName = reader.GetString(0)
+                });
+            }
+
+            // Order by timestamp
+            notAttending = notAttending.OrderByDescending(x => x.TimeStamp).ToList();
+
+            // Close connections
+            reader.Close();
+
+
+            #endregion
+
+            #region Get attending users
+
+            var attendingQuery = new SqlCommand("SELECT AspNetUsers.UserName " +
+                                                "FROM AspNetUsers " +
+                                                "WHERE AspNetUsers.Id NOT IN" +
+                                                    "(SELECT UserId " +
+                                                    "FROM Cancellations " +
+                                                    $"WHERE Cancellations.EventId='{dinnerEventId}')", conn);
+
+            var attendingReader = attendingQuery.ExecuteReader();
+
+            var attending = new List<UserEvent>();
+            while (attendingReader.Read())
+            {
+                attending.Add(new UserEvent
+                {
+                    EventId = dinnerEventId,
+                    UserName = attendingReader.GetString(0)
+                });
+            }
+
+            attendingReader.Close();
+            #endregion
+
+            conn.Close();
+
+            return View(new Tuple<List<UserEvent>, List<UserEvent>>(attending, notAttending));
         }
     }
 }

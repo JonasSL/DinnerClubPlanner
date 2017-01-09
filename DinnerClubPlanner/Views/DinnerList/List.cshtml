@@ -22,8 +22,9 @@
     <table class="table">
         <tr>
             <th>Date</th>
-            <th>Not Attending</th>
             <th>Total Attending</th>
+            <th>Not Attending</th>
+            <th></th>
             <th></th>
 
         </tr>
@@ -34,7 +35,7 @@
 
         @foreach (DinnerClubEvent item in ((Tuple<List<DinnerClubEvent>, int>) Model).Item1)
         {
-            var date = item.Date.ToShortDateString();
+            var date = item.Date.ToLongDateString();
             var notAttending = item.NotAttending.Select(x => x.UserName).ToList();
             var notAttStr = notAttending.Any() ? string.Join(", ", notAttending) : "None";
             var totalAttending = totalUsers - notAttending.Count();
@@ -45,33 +46,34 @@
             
             <tr>
                 <td>@Html.DisplayFor(modelItem => date)</td>
-                <td>@Html.DisplayFor(modelItem => notAttStr)</td>
                 <td>@Html.DisplayFor(modelItem => totalAttending)</td>
+                <td>@Html.DisplayFor(modelItem => notAttStr)</td>
                 <td>
                     
                     @{
                         if (hasCancelled)
                         {
-                            <button class="btn btn-danger @Html.Encode(disabled)" type="button"
+                            <button class="btn btn-info @Html.Encode(disabled)" type="button"
                                     onclick="location.href = '@Url.Action("AttendEvent", new {dinnerEventId = item.Id})'">
                                 Attend
                             </button>
                         }
                         else
                         {
-                            <button class="btn btn-info @Html.Encode(disabled)" type="button"
+                            <button class="btn btn-danger @Html.Encode(disabled)" type="button"
                                     onclick="location.href = '@Url.Action("CancelEvent", new {dinnerEventId = item.Id})'">
                                 Cancel
                             </button>
                         }
                     }
-                    
-                    
-
-                    
-
                 </td>
                 
+                <td>
+                    <button class="btn btn-default" type="button"
+                            onclick="location.href = '@Url.Action("DinnerDetails", new {dinnerEventId = item.Id})'">
+                        Details
+                    </button>
+                </td>
             </tr>
         }
     </table>
