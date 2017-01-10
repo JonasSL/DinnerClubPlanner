@@ -11,24 +11,13 @@ namespace DinnerClubPlanner.Controllers
 {
     public class DinnerListController : Controller
     {
-
-        private List<ApplicationUser> _totalUsers = new List<ApplicationUser>
-        {
-            new ApplicationUser
-            {
-                UserName = "Jonas"
-            },
-            new ApplicationUser
-            {
-                UserName = "Julie"
-            }
-        };
-
-
-        // GET: DinnerList
+        /// <summary>
+        /// Gets all dinners and their information.
+        /// </summary>
+        /// <returns></returns>
         public ActionResult List()
         {
-            ViewBag.Message = "Yo! Velkommen.";
+            ViewBag.Title = "Dinner Club";
 
             // Make SQL connection
             var conn = new SqlConnection();
