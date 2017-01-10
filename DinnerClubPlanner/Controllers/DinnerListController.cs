@@ -24,7 +24,6 @@ namespace DinnerClubPlanner.Controllers
             }
         };
 
-        
 
         // GET: DinnerList
         public ActionResult List()
@@ -104,6 +103,11 @@ namespace DinnerClubPlanner.Controllers
             return View(modelObj);
         }
 
+        /// <summary>
+        /// Cancel the event with the specified Id for the current user.
+        /// </summary>
+        /// <param name="dinnerEventId"></param>
+        /// <returns></returns>
         [Authorize]
         public ActionResult CancelEvent(string dinnerEventId)
         {
@@ -170,14 +174,17 @@ namespace DinnerClubPlanner.Controllers
             return View();
         }
 
+        /// <summary>
+        /// Returns the details for the dinner with the specified id.
+        /// </summary>
+        /// <param name="dinnerEventId"></param>
+        /// <returns></returns>
         public ActionResult DinnerDetails(string dinnerEventId)
         {
             var conn = new SqlConnection();
 
             conn.ConnectionString = System.Configuration.ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
             conn.Open();
-
-
 
             #region Get cancelled users
             // Join on AspNetUsers to get user information
@@ -212,6 +219,7 @@ namespace DinnerClubPlanner.Controllers
 
             #region Get attending users
 
+            // Make query for users not cancellations.
             var attendingQuery = new SqlCommand("SELECT AspNetUsers.UserName " +
                                                 "FROM AspNetUsers " +
                                                 "WHERE AspNetUsers.Id NOT IN" +
@@ -219,8 +227,10 @@ namespace DinnerClubPlanner.Controllers
                                                     "FROM Cancellations " +
                                                     $"WHERE Cancellations.EventId='{dinnerEventId}')", conn);
 
+            // Read query
             var attendingReader = attendingQuery.ExecuteReader();
 
+            // Add the results to a list
             var attending = new List<UserEvent>();
             while (attendingReader.Read())
             {
@@ -236,6 +246,7 @@ namespace DinnerClubPlanner.Controllers
 
             conn.Close();
 
+            // Return the two lists in a tuple
             return View(new Tuple<List<UserEvent>, List<UserEvent>>(attending, notAttending));
         }
     }
